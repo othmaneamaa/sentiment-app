@@ -147,19 +147,6 @@ Après synchronisation, la commande suivante doit afficher les deux auteurs :
 git shortlog -sn --all
 ```
 
-### 3.7 Mention Copilot dans les contributeurs
-
-**Symptôme :** une ligne `Co-authored-by: Copilot` avait été ajoutée au
-dernier commit.
-
-**Risque :** GitHub pouvait associer Copilot aux contributeurs du dépôt.
-
-**Solution :** le dernier commit a été réécrit sans ce trailer, puis poussé
-avec `--force-with-lease`. Le nouveau commit est :
-
-```text
-f62f2d3 README : ajout des membres du binôme
-```
 
 ## 4. Vérifications réalisées
 
