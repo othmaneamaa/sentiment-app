@@ -72,4 +72,4 @@ sentiment-app/
 | Rôle | Nom | Identifiant GitHub | Travail de la semaine 1 |
 | --- | --- | --- | --- |
 | Membre A | Othmane Amaadour | [@othmaneamaa](https://github.com/othmaneamaa) | Cadrage des trois cas et préparation de l'environnement |
-| Membre B | À compléter | À compléter | À compléter |
+| Membre B | Mohcine Errachid | [@mohcine00errachind](https://github.com/mohcine00errachind) | Cadrage et vérification de l'environnement |
