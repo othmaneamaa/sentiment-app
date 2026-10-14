@@ -7,7 +7,7 @@
 
 ---
 
-## 1. Cadrage (Othmane Amaadour & Mohcine Errachid)
+## 1. Cadrage 
 
 Nous avons traité les trois cas proposés en appliquant la grille de décision (a) données étiquetées, (b) vérifiabilité, (c) coût par requête, (d) conséquence d'une erreur.
 
@@ -21,7 +21,7 @@ Le cas 3 est devenu notre fil rouge pour les TP2 et TP3.
 
 ---
 
-## 2. Architecture et environnement (Othmane Amaadour)
+## 2. Architecture et environnement 
 
 Le dépôt `sentiment-app` suit une structure imposée : `src/` pour les scripts, `tests/` pour pytest, `ui/` pour Streamlit, `models/` pour les artefacts, `docs/` pour la documentation et les fiches.
 
@@ -41,7 +41,7 @@ L'environnement est figé en Python 3.11 (`py -3.11 -m venv .venv`) et les dépe
 
 ---
 
-## 3. Modèle (Othmane Amaadour)
+## 3. Modèle 
 
 Le modèle du TP2 est un `Pipeline` scikit-learn qui enchaîne :
 
@@ -62,7 +62,7 @@ Le modèle n'a pas changé : ce sont les données. C'est la démonstration la pl
 
 ---
 
-## 4. Analyse des erreurs (Othmane Amaadour & Mohcine Errachid)
+## 4. Analyse des erreurs 
 
 Sur le jeu de démonstration, l'évaluation (`evaluate.py`) affiche **7 erreurs sur 58** :
 
@@ -84,7 +84,7 @@ Les **2 faux positifs** sont le cas qui compte pour le métier : un client méco
 
 ---
 
-## 5. Seuil d'incertitude (Mohcine Errachid)
+## 5. Seuil d'incertitude 
 
 L'interface du TP3 (`ui/helpers.py`) utilise un seuil `SEUIL_INCERTITUDE = 0.60`. En dessous de 60 % de confiance, l'interface n'affiche pas de verdict tranché mais **« À vérifier par un agent »** en orange.
 
@@ -102,7 +102,7 @@ Nous avons choisi de **conserver 0,60** parce que c'est le seul seuil qui rend l
 
 ---
 
-## 6. Ce qui a échoué (Othmane Amaadour & Mohcine Errachid)
+## 6. Ce qui a échoué 
 
 Trois incidents notables, tous documentés dans la section 8 de l'énoncé :
 
@@ -116,7 +116,7 @@ Ces échecs ne sont pas des détails : ils sont la partie du travail qui ne se v
 
 ---
 
-## 7. Ce que nous ferions autrement (Othmane Amaadour & Mohcine Errachid)
+## 7. Ce que nous ferions autrement 
 
 Trois pistes d'amélioration, dans l'ordre d'importance :
 
@@ -130,7 +130,7 @@ Côté méthode, nous retiendrons aussi de **toujours vérifier le dossier coura
 
 ---
 
-## 8. Répartition du travail (Othmane Amaadour & Mohcine Errachid)
+## 8. Répartition du travail
 
 | Membre | TP1 | TP2 | TP3 |
 |---|---|---|---|
