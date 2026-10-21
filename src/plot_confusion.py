@@ -3,6 +3,7 @@ from pathlib import Path
 
 import joblib
 import matplotlib
+
 matplotlib.use("Agg")   # pas de fenêtre : écriture directe dans un fichier
 import matplotlib.pyplot as plt
 import pandas as pd

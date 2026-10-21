@@ -10,6 +10,7 @@ pytestmark = pytest.mark.skipif(not MODELE.exists(), reason="modÃ¨le non produ
 def test_demarrage_reel_charge_le_modele():
     """D.1 : un client ouvert par Â« with Â» exÃ©cute le lifespan."""
     from fastapi.testclient import TestClient
+
     from api.main import app
 
     with TestClient(app) as client:
@@ -24,9 +25,9 @@ def test_modele_absent_refuse_de_demarrer(monkeypatch, tmp_path):
     from pathlib import Path
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-    import predict as predict_module
-
     from fastapi.testclient import TestClient
+
+    import predict as predict_module
     from api.main import app
 
     monkeypatch.setattr(predict_module, "MODELE", tmp_path / "inexistant.joblib")
@@ -41,6 +42,7 @@ def test_modele_absent_refuse_de_demarrer(monkeypatch, tmp_path):
 def test_modele_non_charge_renvoie_503():
     """D.3 : modÃ¨le retirÃ© de app.state : 503 sur /health et /predict."""
     from fastapi.testclient import TestClient
+
     from api.main import app
 
     with TestClient(app) as client:
@@ -53,6 +55,7 @@ def test_modele_non_charge_renvoie_503():
 def test_modele_en_panne_renvoie_500_sans_message_interne(monkeypatch, exception):
     """D.4 : predict() lÃ¨ve une exception : 500, sans message interne."""
     from fastapi.testclient import TestClient
+
     from api.main import app
 
     with TestClient(app) as client:
