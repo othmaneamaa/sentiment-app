@@ -1,4 +1,6 @@
 """Contrats d'entrée et de sortie de l'API (Pydantic v2)."""
+from typing import Literal
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -18,7 +20,9 @@ class PredictRequest(BaseModel):
 
 class PredictResponse(BaseModel):
     """Réponse de prédiction."""
-    label: str = Field(..., description="POSITIVE ou NEGATIVE")
+    label: Literal["POSITIVE", "NEGATIVE", "INDETERMINE"] = Field(
+        ..., description="POSITIVE, NEGATIVE ou INDETERMINE"
+    )
     score: float = Field(..., ge=0, le=1, description="Confiance de la classe prédite")
     text: str = Field(..., description="Aperçu du texte analysé (100 caractères)")
 
