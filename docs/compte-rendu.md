@@ -46,7 +46,7 @@ L'environnement est figé en Python 3.11 (`py -3.11 -m venv .venv`) et les dépe
 Le modèle du TP2 est un `Pipeline` scikit-learn qui enchaîne :
 
 1. **`TfidfVectorizer`** — transforme chaque avis en un vecteur de fréquences de mots pondérées.
-2. **`LinearSVC`** — classifieur linéaire rapide et robuste sur du texte.
+2. **`LogisticRegression`** — classifieur logistique linéaire, qui fournit des probabilités (utilisées au TP4 pour le seuil d'abstention).
 
 Trois points du code méritent d'être soulignés :
 
@@ -86,19 +86,11 @@ Les **2 faux positifs** sont le cas qui compte pour le métier : un client méco
 
 ## 5. Seuil d'incertitude 
 
-L'interface du TP3 (`ui/helpers.py`) utilise un seuil `SEUIL_INCERTITUDE = 0.60`. En dessous de 60 % de confiance, l'interface n'affiche pas de verdict tranché mais **« À vérifier par un agent »** en orange.
+Le seuil d'abstention a été introduit au **TP4** (`SEUIL_ABSTENTION = 0.60` dans `api/model.py`), puis affiché dans l'interface du **TP5** sous le verdict `INDETERMINE`.
 
-Sur les 290 avis du jeu de démonstration, l'interface annonce **XX cas à vérifier** (soit environ **XX %**), à comparer aux 145 négatifs réels.
+Sur le jeu de test de 58 avis, à 0,60, **16 avis (28 %)** partent vers un humain, avec une exactitude de 0,952 sur les 42 réponses automatiques (2 erreurs). À 0,50, le modèle répond à tout (7 erreurs) ; à 0,70, 21 avis (36 %) partent vers un humain et il n'y a plus d'erreur.
 
-Ce chiffre n'est pas un détail : c'est le curseur qui décide combien de travail humain on garde. Trois régimes :
-
-| Seuil | Avis envoyés à un agent | Risque |
-|---|---|---|
-| 0,50 | Peu | Le modèle tranche seul des cas qu'il ne maîtrise pas |
-| **0,60** | **Modéré** | **Compromis retenu** |
-| 0,75 | Beaucoup | La file humaine se remplit, l'automatisation perd son intérêt |
-
-Nous avons choisi de **conserver 0,60** parce que c'est le seul seuil qui rend l'hésitation du modèle **visible** au lieu de la cacher. Afficher un verdict tranché à 51 % de confiance, c'est mentir par omission. Ce curseur ne se décide d'ailleurs pas dans le code : il se décide **avec l'équipe métier**, qui seule connaît sa capacité à traiter des cas à la main.
+Nous avons choisi **0,60** : c'est le seuil qui élimine 5 des 7 erreurs pour un peu plus d'un quart d'abstentions. Ce curseur ne se décide pas dans le code : il se décide **avec l'équipe métier**, qui seule connaît sa capacité à traiter des cas à la main.
 
 ---
 
@@ -138,3 +130,5 @@ Côté méthode, nous retiendrons aussi de **toujours vérifier le dossier coura
 | **Mohcine Errachid** | Rédaction d'une fiche, vérification de l'installation sur un second poste, commit de validation (contrôle T5) | Évaluation du modèle, mesure du F1, vérification `.gitignore` | Rédaction de `docs/semaine3.md`, tests de l'interface S1/S2/S3 |
 
 Le dépôt est propre, l'étiquette `compte-rendu` fige la version remise, et la CI est verte sur les trois séances (42 puis 45 tests). Nous avons travaillé en binôme sur les séances 1 et 2, et en autonomie alternée sur la séance 3 pour couvrir à la fois le code et la documentation.
+
+> Note (post-TP4/TP5) : `ui/helpers.py` a été remplacé au TP5 par `ui/client.py`, et le seuil d'abstention est passé dans `api/model.py` (`SEUIL_ABSTENTION = 0.60`).
