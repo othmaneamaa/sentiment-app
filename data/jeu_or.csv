@@ -1,16 +1,16 @@
 text,attendu,difficulte,erreur_connue
 "Commande reçue en deux jours, emballage soigné",POSITIVE,,
 "Produit conforme, je recommande",POSITIVE,,
-"Livraison rapide et service client réactif",POSITIVE,,modèle trompé par "client"
+"Livraison rapide et service client réactif",POSITIVE,,
 "Excellent rapport qualité-prix, rien à redire",POSITIVE,,
 "Pas déçu du tout, je recommande",POSITIVE,négation,
 "Je pensais être déçu, mais finalement très bien",POSITIVE,mitigé,
 "Arrivé cassé, bravo le transporteur",NEGATIVE,ironie,
 "Super, encore une commande perdue",NEGATIVE,ironie,
-"Produit correct mais livraison catastrophique",NEGATIVE,mitigé,ordre des mots
-"Bon produit, dommage que le service soit injoignable",NEGATIVE,mitigé,ordre des mots
+"Produit correct mais livraison catastrophique",NEGATIVE,mitigé,
+"Bon produit, dommage que le service soit injoignable",NEGATIVE,mitigé,
 "Je ne suis pas mécontent, mais sans plus",POSITIVE,négation,
-"Ce n'est pas mauvais, mais ce n'est pas bon non plus",NEGATIVE,mitigé,négation double
+"Ce n'est pas mauvais, mais ce n'est pas bon non plus",NEGATIVE,mitigé,
 "Le colis est arrivé en avance, merci",POSITIVE,,
 "Article défectueux, remboursement impossible",NEGATIVE,,
 "Qualité au rendez-vous, je reviendrai",POSITIVE,,

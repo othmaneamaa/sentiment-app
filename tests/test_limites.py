@@ -11,7 +11,8 @@ import pytest
 MODELE = Path(__file__).resolve().parents[1] / "models" / "sentiment.joblib"
 pytestmark = pytest.mark.skipif(not MODELE.exists(), reason="modèle non produit : python src/train.py")
 
-ETIQUETTES = {"POSITIVE", "NEGATIVE"}
+# Trois étiquettes possibles depuis le TP4 : abstention incluse.
+ETIQUETTES = {"POSITIVE", "NEGATIVE", "INDETERMINE"}
 BLANCS = " \t\n\r\x0b\x0c\x85\u00a0"
 
 
