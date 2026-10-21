@@ -1,4 +1,4 @@
-"""Tests aux limites du contrat d'entrée (TP4, étape B). À COMPLÉTER.
+"""Tests aux limites du contrat d'entrée (TP4, étape B).
 
 PredictRequest promet un champ « text », chaîne de 1 à 2000 caractères.
 Ce fichier vérifie cette promesse à ses frontières, puis au hasard (hypothesis).
@@ -10,6 +10,9 @@ import pytest
 
 MODELE = Path(__file__).resolve().parents[1] / "models" / "sentiment.joblib"
 pytestmark = pytest.mark.skipif(not MODELE.exists(), reason="modèle non produit : python src/train.py")
+
+ETIQUETTES = {"POSITIVE", "NEGATIVE"}
+BLANCS = " \t\n\r\x0b\x0c\x85\u00a0"
 
 
 @pytest.fixture(scope="module")
@@ -28,12 +31,16 @@ def en_json(valeur: object) -> bytes:
     return json.dumps(valeur).encode("utf-8")
 
 
-# Étape B.1 : huit cas au moins, chacun avec son code attendu. Deux sont donnés.
-# À ajouter : texte fait d'espaces, un seul caractère, exactement 2000 caractères,
-# champ absent, champ d'un autre type (42), corps qui n'est pas du JSON (b"pas du json").
+# Étape B.1 : huit cas au moins, chacun avec son code attendu.
 CAS = [
     pytest.param(en_json({"text": ""}), 422, id="texte-vide"),
+    pytest.param(en_json({"text": "   "}), 422, id="espaces"),
+    pytest.param(en_json({"text": "a"}), 200, id="un-caractere"),
+    pytest.param(en_json({"text": "a" * 2000}), 200, id="2000-caracteres"),
     pytest.param(en_json({"text": "a" * 2001}), 422, id="2001-caracteres"),
+    pytest.param(en_json({}), 422, id="champ-absent"),
+    pytest.param(en_json({"text": 42}), 422, id="mauvais-type"),
+    pytest.param(b"pas du json", 422, id="corps-non-json"),
 ]
 
 
@@ -41,13 +48,33 @@ CAS = [
 def test_frontieres_du_contrat(client, corps, code_attendu):
     reponse = client.post("/predict", content=corps, headers={"Content-Type": "application/json"})
     assert reponse.status_code == code_attendu
-    # Étape B.2 : pour chaque 422, vérifiez aussi la FORME de la réponse :
-    # « detail » doit être la liste d'erreurs standard de FastAPI (objets avec loc, msg, type).
+    # Étape B.2 : pour chaque 422, la forme standard de FastAPI : liste d'objets {loc, msg, type}
+    if code_attendu == 422:
+        detail = reponse.json()["detail"]
+        assert isinstance(detail, list), f"detail doit être une liste, reçu : {detail!r}"
+        assert detail, "detail ne doit pas être vide"
+        for erreur in detail:
+            assert "loc" in erreur and "msg" in erreur and "type" in erreur
 
 
-# Étape B.5 : deux tests de propriété avec hypothesis, dans ce fichier.
-#   from hypothesis import given, settings, strategies as st
-#   1. tout texte de 1 à 2000 caractères contenant un caractère non blanc :
-#      200, étiquette du contrat, score entre 0 et 1 ;
-#   2. tout texte fait uniquement de blancs : 422, sous la forme standard.
-# Pensez à @settings(deadline=None) : le premier appel peut être plus lent que les autres.
+# Étape B.5 : deux tests de propriété avec hypothesis.
+from hypothesis import given, settings, strategies as st
+
+
+@given(st.text(min_size=1, max_size=2000).filter(lambda s: s.strip()))
+@settings(deadline=None, max_examples=30)
+def test_texte_valide_recoit_200(client, texte):
+    reponse = client.post("/predict", json={"text": texte})
+    assert reponse.status_code == 200
+    corps = reponse.json()
+    assert corps["label"] in ETIQUETTES
+    assert 0.0 <= corps["score"] <= 1.0
+
+
+@given(st.text(alphabet=st.sampled_from(BLANCS), min_size=1, max_size=50))
+@settings(deadline=None, max_examples=30)
+def test_texte_de_blancs_recoit_422(client, texte):
+    reponse = client.post("/predict", json={"text": texte})
+    assert reponse.status_code == 422
+    detail = reponse.json()["detail"]
+    assert isinstance(detail, list)
