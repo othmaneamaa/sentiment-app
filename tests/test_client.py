@@ -40,11 +40,15 @@ def test_espaces_refuses(session):
     assert not r.ok and r.message == client.REFUS
 
 
-def test_modele_non_charge(session, monkeypatch):
+def test_modele_non_charge(session):
     from api.main import app
 
-    monkeypatch.setattr(app.state, "classifier", None)
-    assert client.predire(session, "Tres bien").message == client.SANS_MODELE
+    original = app.state.classifier
+    app.state.classifier = None
+    try:
+        assert client.predire(session, "Tres bien").message == client.SANS_MODELE
+    finally:
+        app.state.classifier = original
 
 
 def test_api_injoignable():
@@ -52,7 +56,18 @@ def test_api_injoignable():
         assert client.predire(sans_serveur, "Tres bien").message == client.INJOIGNABLE
 
 
-def test_lot_et_resume(session):
-    reponses = client.predire_lot(session, ["Livraison rapide, produit conforme, tres satisfait",
-                                            "Produit casse et service injoignable, a fuir", "   "])
+def test_lot_et_resume():
+    from fastapi.testclient import TestClient
+
+    from api.main import app, load_model
+
+    # Recharge le classifier : un test precedent a pu le mettre a None.
+    app.state.classifier = load_model()
+
+    with TestClient(app) as session:
+        reponses = client.predire_lot(session, [
+            "Livraison rapide, produit conforme, tres satisfait",
+            "Produit casse et service injoignable, a fuir",
+            "   ",
+        ])
     assert client.resumer(reponses) == {"NEGATIVE": 1, "POSITIVE": 1, "REFUS OU ERREUR": 1}
