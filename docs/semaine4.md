@@ -36,3 +36,9 @@
 
 - Remarques au départ : ruff **16**, mypy **0** (`Success: no issues found in 4 source files`).
 - Parmi les défauts de la partie 2, combien ruff et mypy avaient-ils signalés ? **Aucun directement** : ruff signalait B904 (raise sans `from`) dans `api/main.py`, qui est la conséquence du défaut « ValueError → 422 avec message interne », mais pas le défaut lui-même. mypy ne signalait rien, parce que `predict()` renvoyait un `dict` (tout ce qui en sort est `Any`). Conclusion : les outils statiques attrapent la forme (imports, types, raises), pas la logique (fuite d'information, label hors contrat). Ce sont les tests d'intégration et de limites qui révèlent les défauts de comportement.
+
+## 6. Biais : le modèle sert-il tous les avis de la même façon ? (étape F)
+
+- `python src/biais.py`, au seuil 0.60 : les **17 avis avec retournement** n'ont que **0.588** d'exactitude (7 erreurs, 15 vers un humain, 2 erreurs restantes), contre **1.000** pour les **41 avis directs**.
+- Les avis longs (27 avis, 0.741) semblent moins bien servis que les courts (31 avis, 1.000), mais la longueur n'est pas la cause : les **10 avis longs sans retournement** sont tous justes. C'est le retournement qui fait échouer le modèle, et la longueur n'est qu'un facteur confondant (un avis qui se retourne est forcément plus long).
+- Question ouverte : l'abstention ne règle pas ce biais, elle le déplace. 15 des 17 avis avec retournement partent vers un humain : le client n'est plus mal classé, mais ce sont les agents qui absorbent le travail sur ce groupe. Avec des groupes de 17 et 41 avis, ces écarts restent à confirmer sur un jeu plus grand.

@@ -39,7 +39,7 @@ def test_requirements_pins_versions(root: Path):
     lines = [ligne for ligne in lines if ligne and not ligne.startswith("#")]
     assert lines, "requirements.txt est vide"
     for line in lines:
-        assert "==" in line, f"version non figÃ©e : {line}"
+        assert "==" in line, f"version non figée : {line}"
 
 
 @pytest.mark.parametrize("pattern", [".venv/", "__pycache__/", ".env", "models/", "mlruns/"])
@@ -49,10 +49,10 @@ def test_gitignore_contains(root: Path, pattern):
 
 
 def test_no_real_env_file_committed(root: Path):
-    """Un .env peut exister localement, mais il ne doit jamais Ãªtre suivi par Git."""
+    """Un .env peut exister localement, mais il ne doit jamais être suivi par Git."""
     git_dir = root / ".git"
     if not git_dir.exists():
-        pytest.skip("pas un dÃ©pÃ´t Git")
+        pytest.skip("pas un dépôt Git")
     import subprocess
 
     tracked = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True).stdout.split()

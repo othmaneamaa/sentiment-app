@@ -1,14 +1,14 @@
-"""Tests d'intÃ©gration : l'API telle qu'elle tourne vraiment (TP4, Ã©tape D)."""
+"""Tests d'intégration : l'API telle qu'elle tourne vraiment (TP4, étape D)."""
 from pathlib import Path
 
 import pytest
 
 MODELE = Path(__file__).resolve().parents[1] / "models" / "sentiment.joblib"
-pytestmark = pytest.mark.skipif(not MODELE.exists(), reason="modÃ¨le non produit : python src/train.py")
+pytestmark = pytest.mark.skipif(not MODELE.exists(), reason="modèle non produit : python src/train.py")
 
 
 def test_demarrage_reel_charge_le_modele():
-    """D.1 : un client ouvert par Â« with Â» exÃ©cute le lifespan."""
+    """D.1 : un client ouvert par « with » exécute le lifespan."""
     from fastapi.testclient import TestClient
 
     from api.main import app
@@ -20,7 +20,7 @@ def test_demarrage_reel_charge_le_modele():
 
 
 def test_modele_absent_refuse_de_demarrer(monkeypatch, tmp_path):
-    """D.2 : chemin du modÃ¨le redirigÃ©, cache vidÃ©, l'API refuse de dÃ©marrer."""
+    """D.2 : chemin du modèle redirigé, cache vidé, l'API refuse de démarrer."""
     import sys
     from pathlib import Path
 
@@ -40,7 +40,7 @@ def test_modele_absent_refuse_de_demarrer(monkeypatch, tmp_path):
 
 
 def test_modele_non_charge_renvoie_503():
-    """D.3 : modÃ¨le retirÃ© de app.state : 503 sur /health et /predict."""
+    """D.3 : modèle retiré de app.state : 503 sur /health et /predict."""
     from fastapi.testclient import TestClient
 
     from api.main import app
@@ -51,9 +51,9 @@ def test_modele_non_charge_renvoie_503():
         assert client.post("/predict", json={"text": "Livraison rapide"}).status_code == 503
 
 
-@pytest.mark.parametrize("exception", [RuntimeError("panne gÃ©nÃ©rique"), ValueError("bug interne")])
+@pytest.mark.parametrize("exception", [RuntimeError("panne générique"), ValueError("bug interne")])
 def test_modele_en_panne_renvoie_500_sans_message_interne(monkeypatch, exception):
-    """D.4 : predict() lÃ¨ve une exception : 500, sans message interne."""
+    """D.4 : predict() lève une exception : 500, sans message interne."""
     from fastapi.testclient import TestClient
 
     from api.main import app
@@ -65,7 +65,7 @@ def test_modele_en_panne_renvoie_500_sans_message_interne(monkeypatch, exception
 
     assert reponse.status_code == 500
     detail = reponse.json()["detail"]
-    assert "panne gÃ©nÃ©rique" not in detail
+    assert "panne générique" not in detail
     assert "bug interne" not in detail
 
 
@@ -85,4 +85,4 @@ def test_etiquettes_inconnues_renvoient_500(monkeypatch):
         )
         reponse = client.post("/predict", json={"text": "Livraison rapide"})
 
-    assert reponse.status_code == 500
+    assert reponse.status_code == 500

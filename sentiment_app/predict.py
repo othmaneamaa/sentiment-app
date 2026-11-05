@@ -38,8 +38,8 @@ def charger_modele():
     """Charge une seule fois par processus, pas a chaque appel."""
     if not MODELE.exists():
         raise FileNotFoundError(
-            f"{MODELE} absent : lancez python src/train.py, "
-            "ou definissez SENTIMENT_MODELE"
+            f"modèle introuvable : {MODELE}. Lancez python src/train.py, "
+            "ou indiquez son chemin dans la variable SENTIMENT_MODELE"
         )
     return joblib.load(MODELE)
 
@@ -64,4 +64,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main())

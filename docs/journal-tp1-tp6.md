@@ -439,14 +439,24 @@ python -m pytest tests/test_explicabilite.py -q
 **Obtenu** :
 
 ```text
-À compléter
+Les 8 termes qui poussent le plus vers « positive » :
+  je (+0.771), que je (+0.764), en (+0.683), livraison en (+0.677), avance (+0.677), ...
+Les 8 termes qui poussent le plus vers « negative » :
+  arrivée (-0.923), produit cassé (-0.923), cassé arrivée (-0.923), cassé (-0.923), au (-0.689), ...
+Prédiction : negative (confiance 0.5335)
+Valeur de base, l'avis moyen d'entraînement : -0.0114
+Termes présents qui poussent vers « negative » : 20, au total -1.0061
+Termes présents qui poussent vers « positive » : 13, au total +0.9177
+Les termes absents, au total : -0.0345
+Base + contributions = -0.1343 ; sortie du modèle = -0.1343
+4 passed
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (que révèlent les termes les plus influents ?) :
 
-> À compléter.
+> Des mots-outils (« je », « en », « au ») sont parmi les termes les plus influents, à côté de « cassé » : le modèle a appris les tournures du jeu de démonstration, pas seulement le sens. Sur l'avis mitigé, 20 termes négatifs l'emportent de peu sur 13 positifs, d'où une confiance de 0.5335 seulement ; la somme base + contributions redonne exactement la sortie du modèle.
 
 ![C6 : explication du modèle](captures/tp2-c6-expliquer.png)
 
@@ -864,14 +874,24 @@ python -m pytest tests/test_biais.py -q
 **Obtenu** :
 
 ```text
-À compléter
+Selon la présence d'un retournement
+  avec retournement             17       0.588        7           15          2
+  direct                        41       1.000        0            1          0
+Selon la longueur
+  court (9 mots ou moins)       31       1.000        0            0          0
+  long (plus de 9 mots)         27       0.741        7           16          2
+Les deux à la fois
+  court, direct                 31       1.000        0            0          0
+  long, avec retournement       17       0.588        7           15          2
+  long, direct                  10       1.000        0            1          0
+8 passed
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (pourquoi la longueur n'est-elle pas la cause ?) :
 
-> À compléter.
+> Les avis qui se retournent sont les moins bien servis (0.588 contre 1.000). La longueur n'est qu'un facteur confondant : les 10 avis longs sans retournement sont tous justes. L'abstention envoie 15 de ces 17 avis à un humain : elle protège le client mais déplace le travail vers les agents. Effectifs petits, à confirmer.
 
 ![T27a : performances par groupe](captures/tp4-t27a-biais.png)
 
@@ -1075,14 +1095,16 @@ streamlit run ui/app.py
 **Obtenu** :
 
 ```text
-À compléter
+Répartition des verdicts : positif 3, négatif 2, à vérifier 1, refus ou erreur 0
+Confiance par tranche : 50-60 % : 1 ; 60-70 % : 1 ; 70-80 % : 3 ; 80-90 % : 1 ; 90-100 % : 0
+9 passed
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (que montre le graphique des confiances que le tableau ne montre pas ?) :
 
-> À compléter.
+> Les calculs sont dans ui/graphiques.py, deux fonctions pures testées sans lancer Streamlit ; la page ne fait que les afficher. Le graphique des confiances montre ce que le tableau cache : la moitié des avis du fichier est sous 70 % de confiance.
 
 ![T34a : les deux graphiques](captures/tp5-t34a-graphiques.png)
 
@@ -1124,14 +1146,16 @@ python -m pytest -q
 **Obtenu** :
 
 ```text
-À compléter
+FAILED tests/test_packaging.py::test_l_api_ne_bricole_plus_le_chemin_de_python
+FAILED tests/test_packaging.py::test_le_modele_se_place_ou_l_on_veut - ImportError
+2 failed, 100 passed, 1 xfailed
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (que réclame chacun des deux échecs ?) :
 
-> À compléter.
+> Les deux échecs sont voulus. Le premier réclame que api/model.py n'ajoute plus src/ à sys.path ; le second, que predict() vive dans le paquet sentiment_app (le module sentiment_app.predict n'existe pas encore) et que le chemin du modèle se règle par SENTIMENT_MODELE.
 
 ![T35](captures/tp6-t35-pytest.png)
 
@@ -1149,14 +1173,16 @@ python src/predict.py "Livraison rapide, produit conforme, très satisfait"
 **Obtenu** :
 
 ```text
-À compléter
+1 failed, 101 passed, 1 xfailed
+FAILED tests/test_packaging.py::test_l_api_ne_bricole_plus_le_chemin_de_python
+positive (confiance 78%)
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (à quoi sert le fichier de compatibilité ?) :
 
-> À compléter.
+> Le fichier de compatibilité src/predict.py garde valides « python src/predict.py » et « import predict » des tests du TP2 et du TP4 : à l'import, il se remplace par le vrai module sentiment_app.predict, si bien que les deux noms désignent le même objet. git mv a gardé l'historique : git log --follow remonte jusqu'au TP2.
 
 ![T36](captures/tp6-t36-deplacement.png)
 
@@ -1174,14 +1200,17 @@ mypy api
 **Obtenu** :
 
 ```text
-À compléter
+132 passed, 1 xfailed
+Select-String : aucune ligne trouvée
+ruff : All checks passed!
+mypy : Success: no issues found in 4 source files
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (qu'est-ce qui a changé dans api/model.py ?) :
 
-> À compléter.
+> api/model.py n'ajoute plus src/ à sys.path : il importe directement from sentiment_app.predict import charger_modele et predict as _predict, et les imports sys et Path ont disparu. L'import marche ainsi dans le dépôt comme une fois la roue installée. Le total inclut les 4 tests de SHAP, 8 de biais, 4 de graphiques et 14 de la fiche modèle.
 
 ![T37](captures/tp6-t37-api.png)
 
@@ -1200,14 +1229,18 @@ sentiment serve
 **Obtenu** :
 
 ```text
-À compléter
+sentiment-app 0.6.0
+{"label": "POSITIVE", "score": 0.777, "text": "Livraison rapide, produit conforme, très satisfait"}
+{"label": "INDETERMINE", "score": 0.5162, "text": "xqzvb wlkptr grombu"}
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+/health : {"status":"OK","model":"tfidf-logreg (TP2, models/sentiment.joblib)"}
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (pourquoi « predict » applique-t-il aussi le seuil d'abstention ?) :
 
-> À compléter.
+> La commande predict passe par api/model.py, comme l'API : elle applique donc le même seuil d'abstention de 0.60, et un texte sans mots connus donne INDETERMINE au lieu d'un verdict au hasard. La ligne de commande et l'API ne peuvent pas répondre différemment au même avis.
 
 ![T38](captures/tp6-t38-commande.png)
 
@@ -1223,14 +1256,15 @@ python -m build --wheel
 **Obtenu** :
 
 ```text
-À compléter
+Successfully built sentiment_app-0.6.0-py3-none-any.whl
+['api', 'sentiment_app', 'sentiment_app-0.6.0.dist-info', 'ui']
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (pourquoi ni tests, ni données, ni modèle ?) :
 
-> À compléter.
+> La roue ne contient que le code. Les tests servent au développement, les données et le modèle ont leur propre cycle de vie : on réentraîne sans republier le code. C'est la ligne packages = ["sentiment_app", "api", "ui"] de pyproject.toml qui fixe ce contenu.
 
 ![T39](captures/tp6-t39-roue.png)
 
@@ -1250,14 +1284,18 @@ roue-tp6\Scripts\sentiment predict "Livraison rapide, produit conforme, très sa
 **Obtenu** :
 
 ```text
-À compléter
+Sans SENTIMENT_MODELE :
+modèle introuvable : .../roue-tp6/.../site-packages/models/sentiment.joblib. Lancez python src/train.py, ou indiquez son chemin dans la variable SENTIMENT_MODELE
+code de sortie : 1
+Avec SENTIMENT_MODELE :
+{"label": "POSITIVE", "score": 0.777, "text": "Livraison rapide, produit conforme, très satisfait"}
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (qu'a-t-il fallu fournir à la roue, et qu'a-t-elle installé seule ?) :
 
-> À compléter.
+> Il a seulement fallu fournir le modèle, par la variable SENTIMENT_MODELE. pip a installé seul les dépendances déclarées dans la roue : FastAPI, uvicorn, Pydantic, scikit-learn 1.5 et joblib. Sans la variable, le paquet cherche le modèle dans site-packages, où il n'est pas, et le message dit comment y remédier.
 
 ![T40](captures/tp6-t40-ailleurs.png)
 
@@ -1301,14 +1339,15 @@ python -m pytest tests/test_fiche_modele.py -q
 **Obtenu** :
 
 ```text
-À compléter
+Au départ : 13 failed, 1 passed
+Fiche remplie : 14 passed
 ```
 
-- [ ] Conforme
+- [x] Conforme
 
 **Commentaire** (quelle rubrique a été la plus difficile à remplir, et pourquoi ?) :
 
-> À compléter.
+> La rubrique la plus difficile a été « Conditions d'usage » : il fallait dire concrètement ce qu'un humain vérifie et quand (tous les INDETERMINE, un échantillon des NEGATIVE, les avis qui se retournent), et pas seulement que « le modèle peut se tromper ». Les tests obligent à citer les vrais chiffres du dépôt : F1 0.879, rappel des négatifs 0.931, version 0.6.0.
 
 ![T41a : fiche modèle](captures/tp6-t41a-fiche-modele.png)
 
