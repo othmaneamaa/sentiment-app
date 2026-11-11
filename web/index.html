@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Analyse d'avis clients</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; }
+        h1 { font-size: 20px; color: #333; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        textarea { height: 80px; resize: vertical; }
+        button { margin-top: 12px; background: #0d6efd; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0b5ed7; }
+        #resultat { margin-top: 16px; padding: 12px; border-radius: 4px; font-size: 14px; }
+        .ok { background: #e7f5e9; color: #1e7e34; border-left: 4px solid #1e7e34; }
+        .warn { background: #fff8e1; color: #8a6d3b; border-left: 4px solid #8a6d3b; }
+        .err { background: #fdecea; color: #b71c1c; border-left: 4px solid #b71c1c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analyse d'avis clients</h1>
+        <p style="font-size:13px;color:#666;">Client web de l'API <code>/v1</code> du cours : la page n'a pas de modèle, elle appelle l'API.</p>
+
+        <label>Adresse de l'API</label>
+        <input id="api-url" value="http://127.0.0.1:8000">
+
+        <label>Clé d'API</label>
+        <input id="api-key" type="password" placeholder="Votre clé client">
+
+        <label>Avis à analyser</label>
+        <textarea id="avis" placeholder="Livraison rapide, produit conforme, très satisfait"></textarea>
+
+        <button id="analyser">Analyser</button>
+
+        <div id="resultat"></div>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>

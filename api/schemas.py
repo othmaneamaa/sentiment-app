@@ -36,3 +36,18 @@ class HealthResponse(BaseModel):
 class ErrorResponse(BaseModel):
     """Format standard des erreurs FastAPI."""
     detail: str
+# --- TP2 : format d'erreur unique pour /v1 ---
+class ChampInvalide(BaseModel):
+    champ: str = Field(..., description="Champ refusé, par exemple body.text")
+    message: str = Field(..., description="Raison du refus")
+
+
+class DetailError(BaseModel):
+    code: str = Field(..., description="Code stable : ENTREE_INVALIDE, NON_AUTHENTIFIE...")
+    message: str = Field(..., description="Message lisible, susceptible de changer")
+    champs: list[ChampInvalide] = Field(default_factory=list)
+
+
+class ErreurV1(BaseModel):
+    """Format unique de toutes les erreurs de /v1."""
+    erreur: DetailError

@@ -1,4 +1,4 @@
-"""API REST du classifier de sentiment (TP3).
+﻿"""API REST du classifier de sentiment (TP1 + TP2).
 
 Lancer : uvicorn api.main:app --reload
 Doc    : http://localhost:8000/docs
@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.model import load_model
 from api.schemas import HealthResponse, PredictRequest, PredictResponse
+from api.v1 import router as v1_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("sentiment_api")
@@ -18,22 +19,21 @@ logger = logging.getLogger("sentiment_api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Charge le modèle une seule fois, avant la première requête."""
-    logger.info("Démarrage de l'API...")
+    """Charge le modele une seule fois, avant la premiere requete."""
+    logger.info("Demarrage de l'API...")
     app.state.classifier = load_model()
-    logger.info("Modèle chargé avec succès : %s", app.state.classifier.model_name)
+    logger.info("Modele charge avec succes : %s", app.state.classifier.model_name)
     yield
-    logger.info("Arrêt de l'API")
+    logger.info("Arret de l'API")
 
 
 app = FastAPI(
     title="Sentiment Analysis API",
-    description="Classifie le sentiment d'un avis en français (modèle du TP2).",
+    description="Classifie le sentiment d'un avis en francais (modele du TP2).",
     version="1.0.0",
     lifespan=lifespan,
 )
 
-# CORS : indispensable pour un frontend web (TP5). En production, lister les domaines autorisés.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -42,11 +42,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(v1_router)
+
 
 def _classifier():
     clf = getattr(app.state, "classifier", None)
     if clf is None:
-        raise HTTPException(status_code=503, detail="Modèle non chargé")
+        raise HTTPException(status_code=503, detail="Modele non charge")
     return clf
 
 
@@ -55,25 +57,18 @@ async def root():
     return {"message": "Sentiment Analysis API", "docs": "/docs", "health": "/health"}
 
 
-@app.get("/health", response_model=HealthResponse, summary="Santé de l'API")
+@app.get("/health", response_model=HealthResponse, summary="Sante de l'API")
 async def health_check():
-    """Répond 200 si le modèle est chargé, 503 sinon. Appelé par les outils de déploiement (TP4)."""
     return {"status": "OK", "model": _classifier().model_name}
 
 
 @app.post("/predict", response_model=PredictResponse, summary="Classifier un texte")
 async def predict(request: PredictRequest):
-    """Renvoie le sentiment (POSITIVE, NEGATIVE ou INDETERMINE) et la confiance.
-
-    - 422 : texte vide ou trop long (Pydantic uniquement)
-    - 503 : modèle non chargé
-    - 500 : erreur inattendue (journalisée côté serveur, jamais renvoyée au client)
-    """
     clf = _classifier()
     try:
         result = clf.predict(request.text)
     except Exception:
-        logger.exception("Erreur lors de la prédiction")
+        logger.exception("Erreur lors de la prediction")
         raise HTTPException(status_code=500, detail="Erreur interne du serveur") from None
     logger.info("predict: %r -> %s (%.2f)", request.text[:50], result["label"], result["score"])
     return result
