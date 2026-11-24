@@ -51,3 +51,40 @@ class DetailError(BaseModel):
 class ErreurV1(BaseModel):
     """Format unique de toutes les erreurs de /v1."""
     erreur: DetailError
+
+
+# --- Analyse par lot ---
+MAX_AVIS_PAR_LOT = 100
+
+
+class LotRequest(BaseModel):
+    """Plusieurs avis à classer en un seul appel (1 à 100 avis)."""
+    avis: list[str] = Field(..., min_length=1, max_length=MAX_AVIS_PAR_LOT,
+                            description="Les avis à classer, chacun de 1 à 2000 caractères",
+                            examples=[["Très satisfait", "Produit cassé, à fuir"]])
+
+    @field_validator("avis")
+    @classmethod
+    def avis_valides(cls, valeurs: list[str]) -> list[str]:
+        """Applique à chaque avis la même règle que PredictRequest."""
+        for i, valeur in enumerate(valeurs):
+            if not valeur.strip():
+                raise ValueError(f"avis n°{i + 1} vide")
+            if len(valeur) > 2000:
+                raise ValueError(f"avis n°{i + 1} trop long (plus de 2000 caractères)")
+        return valeurs
+
+
+class ResumeLot(BaseModel):
+    """Le décompte des verdicts d'un lot."""
+    total: int
+    POSITIVE: int
+    NEGATIVE: int
+    INDETERMINE: int
+
+
+class LotResponse(BaseModel):
+    """Un verdict par avis, dans l'ordre d'envoi, et le résumé du lot."""
+    resultats: list[PredictResponse]
+    resume: ResumeLot
+

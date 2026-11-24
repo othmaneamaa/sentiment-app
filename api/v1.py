@@ -1,9 +1,17 @@
 ﻿"""Routes de la version 1 de l'API (TP2)."""
+from collections import Counter
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from api.schemas import ErreurV1, HealthResponse, PredictRequest, PredictResponse
+from api.schemas import (
+    ErreurV1,
+    HealthResponse,
+    LotRequest,
+    LotResponse,
+    PredictRequest,
+    PredictResponse,
+)
 from api.securite import exiger
 
 ERREURS: dict[int | str, dict[str, Any]] = {
@@ -39,3 +47,26 @@ def predire(corps: PredictRequest, clf: Classifier):
     except Exception:
         raise HTTPException(500, "Erreur interne du serveur") from None
     return resultat
+
+
+# --- Analyse par lot ---
+
+@router.post(
+    "/predict/lot",
+    response_model=LotResponse,
+    summary="Classer plusieurs avis d'un coup (client, admin)",
+    dependencies=[Depends(exiger("client", "admin"))],
+)
+def predire_lot(corps: LotRequest, clf: Classifier):
+    try:
+        resultats = [clf.predict(texte) for texte in corps.avis]
+    except Exception:
+        raise HTTPException(500, "Erreur interne du serveur") from None
+    compte = Counter(r["label"] for r in resultats)
+    resume = {
+        "total": len(resultats),
+        "POSITIVE": compte["POSITIVE"],
+        "NEGATIVE": compte["NEGATIVE"],
+        "INDETERMINE": compte["INDETERMINE"],
+    }
+    return {"resultats": resultats, "resume": resume}
