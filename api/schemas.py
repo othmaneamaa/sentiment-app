@@ -53,7 +53,7 @@ class ErreurV1(BaseModel):
     erreur: DetailError
 
 
-# --- Analyse par lot ---
+# --- Analyse par lot et informations sur le modèle ---
 MAX_AVIS_PAR_LOT = 100
 
 
@@ -88,3 +88,11 @@ class LotResponse(BaseModel):
     resultats: list[PredictResponse]
     resume: ResumeLot
 
+
+class ModeleResponse(BaseModel):
+    """Ce que l'API sait du modèle servi."""
+    model: str = Field(..., description="Nom du modèle servi")
+    seuil_abstention: float = Field(..., description="Sous ce score, le verdict est INDETERMINE")
+    metriques: dict[str, float | int | str] | None = Field(
+        None, description="Contenu de models/metrics.json, ou null s'il est absent"
+    )

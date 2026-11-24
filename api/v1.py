@@ -1,14 +1,18 @@
 ﻿"""Routes de la version 1 de l'API (TP2)."""
+import json
 from collections import Counter
+from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
+from api.model import SEUIL_ABSTENTION
 from api.schemas import (
     ErreurV1,
     HealthResponse,
     LotRequest,
     LotResponse,
+    ModeleResponse,
     PredictRequest,
     PredictResponse,
 )
@@ -49,7 +53,9 @@ def predire(corps: PredictRequest, clf: Classifier):
     return resultat
 
 
-# --- Analyse par lot ---
+# --- Analyse par lot et informations sur le modèle ---
+METRIQUES = Path(__file__).resolve().parents[1] / "models" / "metrics.json"
+
 
 @router.post(
     "/predict/lot",
@@ -70,3 +76,11 @@ def predire_lot(corps: LotRequest, clf: Classifier):
         "INDETERMINE": compte["INDETERMINE"],
     }
     return {"resultats": resultats, "resume": resume}
+
+
+@router.get("/modele", response_model=ModeleResponse, summary="Informations sur le modèle (public)")
+def modele(clf: Classifier) -> dict[str, Any]:
+    metriques = None
+    if METRIQUES.exists():
+        metriques = json.loads(METRIQUES.read_text(encoding="utf-8"))
+    return {"model": clf.model_name, "seuil_abstention": SEUIL_ABSTENTION, "metriques": metriques}

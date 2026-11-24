@@ -1,4 +1,5 @@
-"""Tests de POST /v1/predict/lot."""
+"""Tests de POST /v1/predict/lot et GET /v1/modele."""
+import json
 from pathlib import Path
 
 import pytest
@@ -74,3 +75,26 @@ def test_lot_panne_500_sans_message_interne(client, monkeypatch):
     assert r.status_code == 500
     assert "secret interne" not in r.text
 
+
+# --- GET /v1/modele -----------------------------------------------------------------------------
+
+def test_modele_est_public_et_donne_le_seuil(client):
+    from api.model import SEUIL_ABSTENTION
+
+    r = client.get("/v1/modele")
+    assert r.status_code == 200
+    corps = r.json()
+    assert "TP2" in corps["model"]
+    assert corps["seuil_abstention"] == SEUIL_ABSTENTION
+
+
+def test_modele_renvoie_metrics_json(client):
+    attendu = json.loads((MODELE.parent / "metrics.json").read_text(encoding="utf-8"))
+    assert client.get("/v1/modele").json()["metriques"] == attendu
+
+
+def test_modele_sans_metrics_json(client, monkeypatch, tmp_path):
+    import api.v1
+
+    monkeypatch.setattr(api.v1, "METRIQUES", tmp_path / "absent.json")
+    assert client.get("/v1/modele").json()["metriques"] is None
