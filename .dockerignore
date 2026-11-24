@@ -1,0 +1,16 @@
+# Ce qui n'entre pas dans l'image Docker : l'environnement, les secrets, le modèle local
+.venv/
+.git/
+.env
+models/*.joblib
+data/demo_reviews.csv
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+notebooks/
+images/
+docs/

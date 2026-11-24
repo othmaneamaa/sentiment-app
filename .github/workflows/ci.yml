@@ -28,3 +28,34 @@ jobs:
           . .venv/bin/activate && python -m build --wheel
           python -m venv /tmp/roue && /tmp/roue/bin/pip install dist/*.whl
           cd /tmp && SENTIMENT_MODELE="$GITHUB_WORKSPACE/models/sentiment.joblib" /tmp/roue/bin/sentiment predict "Livraison rapide, produit conforme, trÃ¨s satisfait"
+
+  # Image Docker de l'API : construite, lancée, puis interrogée comme par un vrai client
+  docker:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construire l'image
+        run: docker build -t sentiment-api .
+      - name: Lancer le conteneur
+        run: docker run -d --name api -p 8000:8000 -e API_KEYS="cle-ci-0123456789abcdef:client" sentiment-api
+      - name: Attendre que l'API reponde
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8000/v1/health && exit 0
+            sleep 1
+          done
+          docker logs api
+          exit 1
+      - name: Essais de l'API dans le conteneur
+        run: |
+          curl -sf http://localhost:8000/v1/modele
+          curl -sf -X POST http://localhost:8000/v1/predict/lot \
+            -H "X-API-Key: cle-ci-0123456789abcdef" -H "Content-Type: application/json" \
+            -d '{"avis": ["Livraison rapide, produit conforme, tres satisfait", "Produit casse, a fuir"]}' \
+            | tee reponse.json
+          grep -q '"total":2' reponse.json
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/v1/predict/lot \
+            -H 'Content-Type: application/json' -d '{"avis": ["sans cle"]}')" = "401"
+      - name: Arreter le conteneur
+        if: always()
+        run: docker rm -f api
