@@ -2,6 +2,13 @@
 
 Le numéro de version suit les TP : 0.N.0 à la fin du TP N. Chaque version publiée porte une étiquette Git `v0.N.0`.
 
+## Non publié
+
+- Tests des routes `/v1` et de l'authentification par clé : la couverture de `api/` remonte de 76 % à plus de 95 %, la CI repasse au vert.
+- `POST /v1/predict/lot` : jusqu'à 100 avis en un appel, un verdict par avis et le résumé du lot.
+- `GET /v1/modele` : le nom du modèle, le seuil d'abstention et les mesures de `models/metrics.json`.
+- `Dockerfile` : l'image de l'API, qui entraîne le modèle pendant sa construction ; la CI construit l'image, la lance et l'interroge.
+
 ## 0.6.0 (TP6) : le paquet
 
 - *À compléter par le binôme : ce qui a changé pour celui qui installe, pour celui qui développe, pour la CI.*
